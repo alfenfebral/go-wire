@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	pkg_validator "go-clean-architecture/pkg/validator"
 	"go-clean-architecture/utils"
 	"net/http"
 
@@ -33,7 +34,7 @@ func ResponseErrorValidation(w http.ResponseWriter, r *http.Request, err error) 
 		"success": false,
 		"code":    http.StatusBadRequest,
 		"message": "Validation errors in your request",
-		"errors":  utils.ValidatonError(err).Errors,
+		"errors":  pkg_validator.ValidatonError(err).Errors,
 	})
 }
 

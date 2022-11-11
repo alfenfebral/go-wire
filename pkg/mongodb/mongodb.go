@@ -5,34 +5,49 @@ import (
 	"os"
 	"time"
 
-	"go-clean-architecture/utils"
-
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// InitMongoDB - initialize mongo
-func InitMongoDB() (context.Context, func(), *mongo.Client) {
+type MongoDB interface {
+	Get() *mongo.Client
+}
+
+type MongoDBImpl struct {
+	client *mongo.Client
+}
+
+func NewMongoDB() (MongoDB, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	client, err := mongo.NewClient(options.Client().ApplyURI(os.Getenv("DB_URL")))
+	uri := os.Getenv("DB_URL")
+	opts := options.Client()
+	opts.ApplyURI(uri)
+	client, err := mongo.NewClient(opts)
 	if err != nil {
-		utils.CaptureError(err)
+		return nil, err
 	}
 
 	err = client.Connect(ctx)
 	if err != nil {
-		utils.CaptureError(err)
+		return nil, err
 	}
 
 	// Checking the connection
 	err = client.Ping(context.TODO(), nil)
 	if err != nil {
-		utils.CaptureError(err)
+		return nil, err
 	}
-	logrus.Println("Database connected")
 
-	return ctx, cancel, client
+	logrus.Println("Mongo Database connected")
+
+	return &MongoDBImpl{
+		client: client,
+	}, err
+}
+
+func (m *MongoDBImpl) Get() *mongo.Client {
+	return m.client
 }

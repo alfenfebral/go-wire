@@ -1,4 +1,4 @@
-package utils
+package pkg_validator
 
 import (
 	"fmt"
@@ -9,6 +9,8 @@ import (
 	"github.com/iancoleman/strcase"
 )
 
+type Validator struct{}
+
 var validate *validator.Validate
 
 // CommonError - error response format
@@ -16,8 +18,10 @@ type CommonError struct {
 	Errors map[string]interface{} `json:"errors"`
 }
 
-func InitializeValidator() {
+func NewValidator() *Validator {
 	validate = validator.New()
+
+	return &Validator{}
 }
 
 func ValidatonError(err error) CommonError {

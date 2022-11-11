@@ -4,7 +4,7 @@ GOTEST=$(GO) test
 
 mock: 
 	mockery --dir todo/repository --all --output todo/mocks/repository
-	mockery --dir todo/services --all --output todo/mocks/services
+	mockery --dir todo/service --all --output todo/mocks/service
 run:
 	air
 test:
@@ -20,3 +20,5 @@ test/cover:
 	$(GOTEST) -v -coverprofile=coverage/coverage.out ./...
 	$(GOCOVER) -func=coverage/coverage.out
 	$(GOCOVER) -html=coverage/coverage.out -o coverage/coverage.html
+wire:
+	wire gen go-clean-architecture/dep
