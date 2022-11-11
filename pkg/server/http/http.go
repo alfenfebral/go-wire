@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"os"
 
+	pkg_logger "go-clean-architecture/pkg/logger"
 	handlers "go-clean-architecture/todo/delivery/http"
-	"go-clean-architecture/utils"
 	response "go-clean-architecture/utils/response"
 
 	sentryhttp "github.com/getsentry/sentry-go/http"
@@ -27,9 +27,10 @@ type HTTPServer interface {
 type HTTPServerImpl struct {
 	router *chi.Mux
 	svr    *http.Server
+	logger pkg_logger.Logger
 }
 
-func NewHTTPServer(todoHandler handlers.TodoHTTPHandler) HTTPServer {
+func NewHTTPServer(logger pkg_logger.Logger, todoHandler handlers.TodoHTTPHandler) HTTPServer {
 	// Create an instance of sentryhttp
 	sentryHandler := sentryhttp.New(sentryhttp.Options{})
 
@@ -56,6 +57,7 @@ func NewHTTPServer(todoHandler handlers.TodoHTTPHandler) HTTPServer {
 
 	return &HTTPServerImpl{
 		router: router,
+		logger: logger,
 	}
 }
 
@@ -67,7 +69,7 @@ func (s *HTTPServerImpl) PrintAllRoutes() {
 	}
 	router := s.GetRouter()
 	if err := chi.Walk(router, walkFunc); err != nil {
-		utils.CaptureError(err)
+		s.logger.Error(err)
 	}
 }
 

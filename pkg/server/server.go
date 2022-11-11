@@ -2,8 +2,8 @@ package server
 
 import (
 	"context"
+	pkg_logger "go-clean-architecture/pkg/logger"
 	pkg_http_server "go-clean-architecture/pkg/server/http"
-	"go-clean-architecture/utils"
 
 	"github.com/sirupsen/logrus"
 )
@@ -15,12 +15,14 @@ type Server interface {
 
 type ServerImpl struct {
 	httpServer pkg_http_server.HTTPServer
+	logger     pkg_logger.Logger
 }
 
-func NewServer(httpServer pkg_http_server.HTTPServer) (Server, error) {
+func NewServer(logger pkg_logger.Logger, httpServer pkg_http_server.HTTPServer) Server {
 	return &ServerImpl{
 		httpServer: httpServer,
-	}, nil
+		logger:     logger,
+	}
 }
 
 // Run server
@@ -28,7 +30,7 @@ func (s *ServerImpl) Run() error {
 	go func() {
 		err := s.httpServer.Run()
 		if err != nil {
-			utils.CaptureError(err)
+			s.logger.Error(err)
 		}
 	}()
 
@@ -39,7 +41,7 @@ func (s *ServerImpl) Run() error {
 func (s *ServerImpl) GracefulStop(ctx context.Context, done chan bool) {
 	err := s.httpServer.GracefulStop(ctx)
 	if err != nil {
-		utils.CaptureError(err)
+		s.logger.Error(err)
 	}
 
 	logrus.Info("gracefully shutdowned")

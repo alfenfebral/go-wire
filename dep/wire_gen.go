@@ -7,6 +7,7 @@
 package dep
 
 import (
+	"go-clean-architecture/pkg/logger"
 	"go-clean-architecture/pkg/mongodb"
 	"go-clean-architecture/pkg/server"
 	"go-clean-architecture/pkg/server/http"
@@ -18,6 +19,7 @@ import (
 // Injectors from wire.go:
 
 func InitializeServer() (server.Server, error) {
+	logger := pkg_logger.NewLogger()
 	mongoDB, err := mongodb.NewMongoDB()
 	if err != nil {
 		return nil, err
@@ -25,10 +27,7 @@ func InitializeServer() (server.Server, error) {
 	mongoTodoRepository := repository.NewMongoTodoRepository(mongoDB)
 	todoService := service.NewTodoService(mongoTodoRepository)
 	todoHTTPHandler := handlers.NewTodoHTTPHandler(todoService)
-	httpServer := pkg_http_server.NewHTTPServer(todoHTTPHandler)
-	serverServer, err := server.NewServer(httpServer)
-	if err != nil {
-		return nil, err
-	}
+	httpServer := pkg_http_server.NewHTTPServer(logger, todoHTTPHandler)
+	serverServer := server.NewServer(logger, httpServer)
 	return serverServer, nil
 }

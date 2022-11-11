@@ -5,6 +5,7 @@
 package dep
 
 import (
+	pkg_logger "go-clean-architecture/pkg/logger"
 	pkg_mongodb "go-clean-architecture/pkg/mongodb"
 	pkg_server "go-clean-architecture/pkg/server"
 	pkg_http_server "go-clean-architecture/pkg/server/http"
@@ -17,6 +18,7 @@ import (
 
 func InitializeServer() (pkg_server.Server, error) {
 	wire.Build(
+		pkg_logger.NewLogger,
 		pkg_mongodb.NewMongoDB,
 		repository.NewMongoTodoRepository,
 		service.NewTodoService,

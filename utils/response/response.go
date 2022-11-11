@@ -1,12 +1,11 @@
 package utils
 
 import (
-	"fmt"
 	pkg_validator "go-clean-architecture/pkg/validator"
-	"go-clean-architecture/utils"
 	"net/http"
 
 	"github.com/go-chi/render"
+	"github.com/sirupsen/logrus"
 )
 
 // H is a shortcut for map[string]interface{}
@@ -50,7 +49,7 @@ func ResponseBodyError(w http.ResponseWriter, r *http.Request, err error) {
 
 // ResponseError - send response error (500)
 func ResponseError(w http.ResponseWriter, r *http.Request, err error) {
-	utils.CaptureError(err)
+	logrus.Error(err)
 
 	render.Status(r, http.StatusInternalServerError)
 	render.JSON(w, r, H{
@@ -104,7 +103,7 @@ func ResponseOKList(w http.ResponseWriter, r *http.Request, data *ResponseSucces
 func ResponseInternalServerError(w http.ResponseWriter, r *http.Request, err error) {
 	render.Status(r, http.StatusOK)
 
-	fmt.Println(err)
+	logrus.Error(err)
 	render.JSON(w, r, H{
 		"success": false,
 		"code":    http.StatusInternalServerError,
