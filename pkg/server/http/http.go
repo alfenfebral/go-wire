@@ -10,7 +10,6 @@ import (
 	handlers "go-clean-architecture/todo/delivery/http"
 	response "go-clean-architecture/utils/response"
 
-	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
@@ -31,14 +30,10 @@ type HTTPServerImpl struct {
 }
 
 func NewHTTPServer(logger pkg_logger.Logger, todoHandler handlers.TodoHTTPHandler) HTTPServer {
-	// Create an instance of sentryhttp
-	sentryHandler := sentryhttp.New(sentryhttp.Options{})
-
 	router := chi.NewRouter()
 	router.Use(
-		sentryHandler.Handle,
 		render.SetContentType(render.ContentTypeJSON), // Set content-Type headers as application/json
-		middleware.Logger,                             // Log API request calls
+		middleware.Logger, // Log API request calls
 		// middleware.DefaultCompress, // Compress results, mostly gzipping assets and json
 		middleware.RedirectSlashes, // Redirect slashes to no slash URL versions
 		middleware.Recoverer,       // Recover from panics without crashing server
